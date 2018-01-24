@@ -1,0 +1,48 @@
+/**************皮肤切换*****************/
+#bj_header {
+	position: relative;
+}			
+#skin_btn{
+	position: absolute;
+	/*border: solid 1px red;*/
+	left: .1rem;
+}
+#skin_btn span{
+	cursor: pointer;
+	display: inline-block;
+	margin-left: .02rem;
+	width: .4rem;
+	height: .2rem;
+	line-height: .2rem;
+	border-radius: 3px;
+	text-align: center;
+	color: #fff;
+}
+#skin_btn #skin_btn00{
+	border: solid 1px #19aed5;					
+	 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #012f61), color-stop(100%, #01040d));
+	 		
+}
+#skin_btn #skin_btn01{
+	border: solid 1px #0b68b5;
+	background: #3497ea;
+}
+#skin_btn #skin_btn02{
+	border: solid 1px #fff;
+	 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #979a8f), color-stop(100%, #9a634e));
+	 
+}						
+
+#thecanvas { display:none}
+
+#btnSave{ 
+ position: absolute;
+    top: 25px;
+    right: 75px;
+    width: 20px;
+    height: 20px;
+    background: url(../img/download.png) center / cover no-repeat;
+	cursor:pointer
+}

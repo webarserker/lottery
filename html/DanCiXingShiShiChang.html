@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/base.css" />
+		<link rel="stylesheet" type="text/css" href="../css/background.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/qiehuan.css"/>
+		<style type="text/css">
+.botbox{
+	    width: 380px;
+	    height: 150px;
+	    display: flex;
+	    flex-wrap: wrap;
+	    align-items: center;
+	    justify-content: space-around;
+	    position: absolute;
+	    right: 0px;
+	    z-index: 200;
+	    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eca463), color-stop(100%, #ea5d7a));
+	    border-radius: 10px;
+    	box-shadow: 1px 1px 5px 1px #3c2d2d;
+    	display: none;
+}
+.botbox input {
+		width: 80px;
+		height: 25px;
+		
+}
+#skin_btn input{
+		cursor: pointer;
+}
+		</style>
+	</head>
+
+	<body id="body_baojing">
+		
+		<!--[if lt IE 10]>
+		  <div class="llqts" style="height:80px;width:100%;font-size:20px;color:#f00">
+		      <p>网站改版啦！您的浏览器版本过低，请升级浏览器<a target="_blank" rel="nofollow" href="http://windows.microsoft.com/zh-cn/internet-explorer/download-ie">IE10及以上</a>(注：360浏览器调至极速模式<span style='position:relative;display:inline-block;width:170px'><img style='position:absolute;top:-20px' src='../img/zh01.png'/></span>)    或使用<a target="_blank" rel="nofollow" href="http://rj.baidu.com/soft/detail/25718.html?ald">谷歌浏览器</a>&nbsp;、&nbsp;<a href="http://www.firefox.com.cn/" target="_blank" rel="nofollow">火狐浏览器</a>来体验网站的新功能！</p>
+		  </div>
+		<![endif]-->			
+		
+		<header id="bj_header">
+			<div id="skin_btn">
+				<span id="skin_btn00">上一天</span>
+				<span id="skin_btn01">今天</span>
+				<span id="skin_btn02">下一天</span>
+				<strong style="color: #fff;">开始：</strong><input type="text" id="start" placeholder="0101001" value="0101001" />
+				<strong style="color: #fff;">结束：</strong><input type="text" id="end" placeholder="0101120" value="0101120" />
+				<input type="button" onclick="reader()" value="查询">
+				
+				<input type="button" onclick="long()" value="龙出现次数">
+				<input type="button" onclick="target()" value="虎出现次数">
+				<input type="button" onclick="he()" value="和出现次数">
+				<input type="button" onclick="beforehe() " value="和之前出现的连数" />
+				
+				<input type="button" onclick="loadreald('2017')" value="2017年数据" name="2017">
+				<input type="button" onclick="loadreald('2018')" value="2018年数据" name="2018">
+				
+				<div class="botbox" name="2017">
+					<input type="button" onclick="silde(1, 2017)" value="2017年1月">
+					<input type="button" onclick="silde(2, 2017)" value="2017年2月">
+					<input type="button" onclick="silde(3, 2017)" value="2017年3月">
+					<input type="button" onclick="silde(4, 2017)" value="2017年4月">
+					<input type="button" onclick="silde(5, 2017)" value="2017年5月">
+					<input type="button" onclick="silde(6, 2017)" value="2017年6月">
+					<input type="button" onclick="silde(7, 2017)" value="2017年7月">
+					<input type="button" onclick="silde(8, 2017)" value="2017年8月">
+					<input type="button" onclick="silde(9, 2017)" value="2017年9月">
+					<input type="button" onclick="silde(10, 2017)" value="2017年10月">
+					<input type="button" onclick="silde(11, 2017)" value="2017年11月">
+					<input type="button" onclick="silde(12, 2017)" value="2017年12月">
+				</div>
+				<div class="botbox" name="2018">
+					<input type="button" onclick="silde(1, 2018)" value="2018年1月">
+				</div>
+			</div>				
+			<div id="bj_top" style="display: none;">
+				<h1>单次行驶时长统计</h1>
+				<span class="bj_top_1"></span>
+				<span class="bj_top_2"></span>
+				<span class="bj_top_3"></span>
+			</div>
+		</header>
+		<div id="bj_content">
+			
+				<div id="bg_content_box">
+					<div id="bg_content_jiao"></div>
+					<!--	内容-->
+					<span class="bj_jiao_1"></span>
+					<span class="bj_jiao_2"></span>
+					<span class="bj_jiao_3"></span>
+					<span class="bj_jiao_4"></span>					
+				</div>
+
+			<span class="bj_content_1"></span>
+			<span class="bj_content_2"></span>
+			<span class="bj_content_3"></span>
+			<span class="bj_content_4"></span>
+			<span class="bj_content_5">
+				<span class="bg_content_left">|</span>
+				<span class="bg_content_center">加载中...</span>
+				<span class="bg_content_right">|</span>
+			</span>			
+		</div>
+
+		<script type="text/javascript" src="../js/jquery.js"></script>
+		<script type="text/javascript" src="../js/echarts.min.js"></script>
+		<script type="text/javascript">
+			
+
+				// 使用刚指定的配置项和数据显示图表。
+				//myChart.setOption(option);
+
+				//用于使chart自适应高度和宽度
+				window.onresize = function() {
+					var box = document.getElementById('bj_content');
+					var worldMapContainer = document.getElementById('bg_content_jiao');
+					//用于使chart自适应高度和宽度,通过窗体高宽计算容器高宽
+					var resizeWorldMapContainer = function() {
+						$("#bg_content_jiao").css({ 'width': box.clientWidth - 60, 'height': box.clientHeight - 40 });
+
+					};
+
+					var myChart = echarts.init(worldMapContainer);
+					//重置容器高宽
+					resizeWorldMapContainer();
+					myChart.resize();
+
+					tubiao();
+					
+					$('#bg_content_jiao').css({});
+
+				};
+
+				////设置容器高宽
+				//resizeWorldMapContainer();
+				//// 基于准备好的dom，初始化echarts实例
+				//var myChart = echarts.init(worldMapContainer);					
+				//	
+	
+	
+	var real = {
+					startDay: $('#start').val(),
+					endDay: $('#end').val(),
+					firstKey: '',
+					lastKey: '',
+					context: './2017mock/1.json'
+				}
+	
+	var startDay = real.startDay
+	var endDay = real.endDay
+	var year = '2017', month = '1'
+	
+	
+	function silde(tip, dp){
+		year = dp
+		real.context = './'+dp+'mock/'+tip+'.json'
+		var months = tip > 9 ? tip: '0' + tip
+		month = months
+		$('#start').val(months+'01001')
+		$('#end').val(months+'01120')
+		console.log(tip, real.context)
+		
+		if (tip === 2) {
+			$('#start').val('0203001')
+			$('#end').val('0203120')
+		}
+		
+		tubiao($('#start').val(), $('#end').val())
+	}
+	
+	
+	reader()
+	
+	function tip(title, end) {
+		var titles = title
+		$('.bg_content_center').html(year + '年'+titles.slice(0, 2)+'月'+titles.slice(2, 4)+'日<br/>'+title.slice(4, 7) + ' ~ ' + end.slice(4, 7) +'期')
+	}
+	
+	function reader() {
+				startDay = $('#start').val()
+				endDay = $('#end').val()
+				tubiao($('#start').val(), $('#end').val())
+				
+	}			
+				
+	function loadreald(tip){
+		console.log(tip)
+		$('.botbox').hide()
+		$('.botbox[name='+tip+']').fadeToggle().css('display', 'flex')
+	}
+	
+	$('#bj_content').click(function(){ $('.botbox').hide() })
+	
+				$('#skin_btn00').click(function(){
+					
+					
+					startDay = '0' + (parseInt(startDay) - 1000)
+					
+					endDay = '0' + (parseInt(endDay) - 1000)
+					
+					
+					var sum = parseInt(real.endDay) - parseInt(real.startDay)
+					
+					if (startDay < real.firstKey) {
+						startDay = real.startDay
+						endDay  = '0' + ( parseInt(real.startDay) + sum )
+					}
+					tubiao(startDay, endDay)
+					
+				})
+				
+				$('#skin_btn02').click(function(){
+					
+					
+					startDay = '0' + (parseInt(startDay) + 1000)
+					
+					endDay = '0' + (parseInt(endDay) + 1000)
+					
+					
+					
+					if (startDay > '0123120') {
+						startDay = real.startDay
+						endDay  = real.endDay
+					}
+					
+					tubiao(startDay, endDay)
+					
+				})
+				
+				$('#skin_btn01').click(function(){
+					
+					startDay = real.startDay
+					endDay  = real.endDay
+					
+					tubiao(startDay, endDay)
+					
+				})
+
+
+function arrayCnt(arr, lib) {
+	
+	var strings = ''
+	
+	if (lib === 0) {
+		strings = '龙'
+	} else if (lib === 1){
+		strings = '虎'
+	} else if (lib === 2){
+		strings = '和'
+	}
+	
+    var newArr = [];
+    for(var i = 0; i < arr.length; i++) {
+        if(newArr.indexOf(arr[i]) == -1) {
+            newArr.push(arr[i])
+        }
+    }
+    var newarr2 = new Array(newArr.length);
+    for(var t = 0; t < newarr2.length; t++) {
+        newarr2[t] = 0;
+    }
+    for(var p = 0; p < newArr.length; p++) {
+        for(var j = 0; j < arr.length; j++) {
+            if(newArr[p] == arr[j]) {
+                newarr2[p]++;
+            }
+        }
+
+    }
+    
+    var sum = $(".bg_content_center").html().split('日')[1].split('~')
+    var start = $('#start').val()
+    var end = $('#end').val()
+    var dilost = ( (end - start)/1000>1?parseInt((end - start)/1000): 0 ) * 120 + (sum[1].replace(/[^\d.]/g,'') - sum[0].replace(/[^\d.]/g,''))
+    var sort = []
+    
+    for(var m = 0; m < newArr.length; m++) {
+        sort.push("查询了"+dilost+"条数据" + newArr[m] + "连"+strings+"的出现次数为：" + newarr2[m]);
+    }
+    
+    console.log(sort)
+    
+    sort.unshift('——————————————————————————————————————大吉大利晚上吃鸡!')
+    $(sort.sort()).each(function(k, v){
+    	console.log(v)
+    })
+    
+}
+
+function findall(a,x){
+ var results=[],
+   len=a.length,
+   pos=0;
+ while(pos<len){
+  pos=a.indexOf(x,pos);
+  if(pos===-1){//未找到就退出循环完成搜索
+   break;
+  }
+  results.push(pos);//找到就存储索引
+  pos+=1;//并从下个位置开始搜索
+ }
+ return results;
+}
+
+function find(arr, continuous) {
+    var pre = arr[0];
+    var count = 1;
+    var lib = {}, sat = []
+    
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] == pre + 1) {
+            count++;
+            pre++;
+        } else {
+            if (count >= continuous) {
+                lib[i] = arr.slice(i - count, i)
+            }
+            pre = arr[i];
+            first = i;
+            count = 1;
+        }
+    }
+
+    if (count >= continuous) {
+        	 lib[i] = arr.slice(i - count, i)
+    }
+    
+    
+   $.each(lib, function(k, v){
+    	sat = sat.concat(v)
+   })
+    
+    $(sat).each(function(k, v){
+    	arr = arr.filter(function(item){
+			return item !== v
+		});
+    })
+    
+    return {
+    			lib: lib,
+    			brower: arr
+    		}
+    
+}
+
+Array.prototype.ct = function(c, add){
+	    var reg = new RegExp(c+"+","g")
+	       ,t = this.join('').match(reg)
+	       ,m = 0;
+	    
+	    var prediction = []
+	       
+	    for(var i=0,j=t.length;i<j;i++){
+	        var ddp = []
+	        m = t[i].length
+	        add.push(m)
+		
+			if(i>2){
+				ddp.push(t[i-2].length)
+		        ddp.push(t[i-1].length)
+		        ddp.push(t[i].length)
+				prediction.push(ddp)
+			}
+			
+	    }
+	    
+	    console.log(prediction)
+	    
+	    return m;
+	}
+
+var longlength = ""
+
+function tubiao(startDay, endDay) {
+				$.ajax({
+					type:"get",
+					url: real.context,
+					async:true
+				}).then(function(response){
+					
+					var dist = []
+					var keys = []
+					var values= []
+					var num = 0
+					var he = 0
+					var months = month  
+					
+					
+					$.each(response, function(k, v){
+						num++
+						dist.push(k)
+						
+						if(k >= startDay && k <= endDay) {
+							
+							if (v === "2") {
+								he++
+							}
+							
+							keys.push(k)
+							values.push(v)
+						}
+					
+					})
+					
+					real.firstKey = dist[0]
+					real.lastKey = dist[num-1]
+					
+					var lest = parseInt($('#end').val()) > parseInt(real.lastKey)? real.lastKey : $('#end').val()
+					
+					tip(startDay, lest)
+					
+					longlength = values
+					
+					var dom = document.getElementById("bg_content_jiao");
+					var myChart = echarts.init(dom);
+					myChart.showLoading({ text: '正在加载数据' })
+
+					data =  {
+					     tooltip: {
+					        trigger: 'axis',
+					        formatter: '{b}:\n{c}'  
+					    },
+					    legend: {
+					    	x: '8%',
+					    	y: '88%',
+					        data:[ 
+					        		{
+					        			name: months+'月份数据统计',
+					        			icon : 'pin'
+					        			
+					        		}
+					        	],
+					        textStyle: {
+					                        color: '#fff',
+					                        fontSize: 16,
+					                        
+					                   }
+					    },
+					    grid: {
+					        left: '5%',
+					        right: '4%',
+					        bottom: '20%',
+					        containLabel: true
+					    },
+					    toolbox: {
+					        show : true,
+					        feature : {
+					            dataView : {show: true, readOnly: false},
+					            magicType : {show: true, type: ['line', 'bar']},
+					            restore : {show: true},
+					            saveAsImage : {show: true}
+					        }
+					    },						    
+					    xAxis :[
+					        {
+					            type: 'category',
+					            axisTick: {
+					                alignWithLabel: true
+					            },
+					            axisLine:{
+					                lineStyle:{
+					                    color: '#0f4465'
+					                }
+					            },
+					            axisLabel: {
+					                    textStyle: {
+					                        color: '#fff',
+					                        fontSize: 12
+					                    }
+					               },
+					             
+					            data: keys
+					        }
+					    ],
+					    yAxis : [
+					         {
+					            type: 'value',
+					            name:' ',
+					            axisLabel: {
+					                    textStyle: {
+					                        color: '#fff',
+					                        fontSize: 14,
+					                    },
+					                    formatter: function(value, index){
+					                    	var hash = ""
+					                    	if(value === 0){
+					                    		hash = '龙'
+					                    	} else if(value === 1){
+					                    		hash = '虎'
+					                    	}else if(value === 2){
+					                    		hash = '和'
+					                    	}
+					                    	
+					                    	return hash
+					                    }
+					               },
+					            axisLine:{
+					                lineStyle:{
+					                    color: '#0f4465'
+					                }
+					            },
+					             splitLine: {
+							            lineStyle: {
+							                type: 'line',
+					                		color: '#0f476a'
+							            }
+							        }
+					        }
+					    ],
+					    visualMap: {
+					        show: true,
+					        dimension: 0,
+					        top: '84%',
+					        textStyle: {
+					        	color: '#fff'
+					        },
+					        pieces: [{
+					            gt: 0,
+					            lte: 18,
+					            color: '#e7e7e7'
+					        }, {
+					            gt: 18,
+					            lte: 72,
+					            color: '#B03A5B'
+					        }, {
+					            gt: 72,
+					            color: '#362d68'
+					        }]
+					    },
+					    series : [
+					       {
+				            name: months + '月份数据统计',
+				            type:'line',
+				            smooth: true,
+				            axisLabel: {
+				            	textStyle: {
+					                        color: '#fff',
+					                        fontSize: 14,
+					                    }
+				            },
+					        label: {
+					        	normal: {
+				               		show: true
+			            		}
+				        	},
+				        	showAllSymbol: true,
+			        		symbolSize: 12,
+			            	areaStyle: {
+			                normal: {
+			                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+			                        offset: 0,
+			                        color: 'rgb(255, 158, 68)'
+			                    }, {
+			                        offset: 1,
+			                        color: 'rgb(255, 70, 131)'
+			                    }])
+			                }
+				            },
+				            data: values
+					       }
+					    ]
+					};
+
+					myChart.hideLoading();
+					if(data && typeof data === "object") {
+						myChart.setOption(data);
+						window.onresize=myChart.resize
+					}
+				})
+
+			};
+
+
+function long() {
+	var sdk=longlength, add = []
+	sdk.ct(0, add)
+ 	arrayCnt(add, 0);
+}
+
+function target() {
+	var sdk=longlength, add = []
+	sdk.ct(1, add)
+ 	arrayCnt(add, 1);
+}
+
+function he() {
+	var sdk=longlength, add = []
+	sdk.ct(2, add)
+ 	arrayCnt(add, 2);
+}
+
+function beforehe() {
+	var sdk=longlength
+	var prediction = []
+	var dtt = []
+	var original = findall(sdk, "2")
+	console.log('————————————————————————————————————————————————大吉大利晚上吃鸡!——————————————————————————————————————————————')
+	if(find(original, 2).brower !== []){
+		$(find(original, 2).brower).each(function(k, v){
+			var first = sdk[v-2] == 0 ? ' 龙 ': (sdk[v-2] == 2 ?' 和 ' : ' 虎 ')
+			var two = sdk[v-1] == 0 ? ' 龙 ': (sdk[v-1] == 2 ?' 和 ' : ' 虎 ')
+			var ben = sdk[v] == 0 ? ' 龙 ': (sdk[v] == 2 ?' 和 ' : ' 虎 ')
+			var three = sdk[v+1] == 0 ? ' 龙 ': (sdk[v+1] == 2 ?' 和 ' : ' 虎 ')
+			var free = sdk[v+2] == 0 ? ' 龙 ': (sdk[v+2] == 2 ?' 和 ' : ' 虎 ')
+			console.log(`第${v+1}个位置出现了1连和:[${first}、${two}、${ben}、${three}、${free}],前面2位分别是[${first}、${two}],后面2位分别是[${three}、${free}]`)
+		})
+	} else {
+		console.log('到目前位置并没有出现过连和')
+		return 
+	}
+	
+	
+	if (JSON.stringify(find(original, 2).lib) !== "{}") {
+		$.each((find(original, 2).lib), function(k, v){
+			
+			var first = sdk[v[0]-2] == 0 ? ' 龙 ': (sdk[v[0]-2] == 2 ?' 和 ' : ' 虎 ')
+			var two = sdk[v[0]-1] == 0 ? ' 龙 ': (sdk[v[0]-1] == 2 ?' 和 ' : ' 虎 ')
+			
+			var ben = sdk[v[0]] == 0 ? ' 龙 ': (sdk[v[0]] == 2 ?' 和 ' : ' 虎 ')
+			
+			var three = sdk[v[0]+v.length] == 0 ? ' 龙 ': (sdk[v[0]+v.length] == 2 ?' 和 ' : ' 虎 ')
+			var free = sdk[v[0]+v.length+1] == 0 ? ' 龙 ': (sdk[v[0]+v.length+1] == 2 ?' 和 ' : ' 虎 ')
+			
+			console.log(`第${v[0]+1}个位置出现了${v.length}连和:[${first}、${two}、${v.length}连和、${three}、${free}],前面2位分别是[${first}、${two}],后面2位分别是[${three}、${free}]`)
+		})
+	} else {
+		console.log('到目前位置并没有出现过2连和')
+	}
+	
+	
+}
+
+
+
+</script>
+		<script type="text/javascript" src="../js/qiehuan.js"></script>
+	</body>
+
+</html>
